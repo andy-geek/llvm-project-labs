@@ -555,6 +555,7 @@ void X86PassConfig::addPreRegAlloc() {
     addPass(createX86OptimizeLEAs());
     addPass(createX86CallFrameOptimization());
     addPass(createX86AvoidStoreForwardingBlocks());
+    addPass(createX86AvoidTrailingCallPass());
   }
 
   addPass(createX86SpeculativeLoadHardeningPass());
