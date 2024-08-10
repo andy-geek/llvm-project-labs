@@ -1,3 +1,20 @@
+// In a backend write an optimization pass that replaces multiplication and addition operation:
+// tmp = a * b;
+// d = tmp + c;
+// with muladd instruction:
+// d = muladd(a, b, c);
+
+// It would be nice to implement via MachineFunction pass after Instruction selection step, but before regalloc
+
+// For x86 arch such instruction example is vfmadd213pd(...). Possible sample to use is:
+
+// #include <immintrin.h>
+
+// __m128d muladd(__m128d a, __m128d b, __m128d c) {
+//     return a * b + c;
+// }
+
+
 #include "X86.h"
 #include "X86InstrInfo.h"
 #include "X86Subtarget.h"
