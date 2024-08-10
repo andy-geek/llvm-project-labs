@@ -1,3 +1,17 @@
+// Print the names of all classes and their fields
+// Example:
+// struct MyClass {
+//   int a;
+//   float b;
+// };
+
+// ---
+
+// MyClass
+//   |_ a
+//   |_ b
+
+
 #include "clang/Frontend/FrontendPluginRegistry.h"
 #include "clang/AST/AST.h"
 #include "clang/AST/ASTConsumer.h"
