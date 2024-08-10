@@ -1,47 +1,31 @@
 #include "llvm/IR/Function.h"
-#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Pass.h"
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Passes/PassPlugin.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace llvm;
 
-static cl::opt<bool> Wave("wave-goodbye", cl::init(false),
-                          cl::desc("wave good bye"));
-
 namespace {
-
-bool runBye(Function &F) {
-  if (Wave) {
-    errs() << "Bye: ";
-    errs().write_escaped(F.getName()) << '\n';
-  }
-  return false;
-}
-
-struct LegacyBye : public FunctionPass {
-  static char ID;
-  LegacyBye() : FunctionPass(ID) {}
-  bool runOnFunction(Function &F) override { return runBye(F); }
-};
 
 struct Bye : PassInfoMixin<Bye> {
   PreservedAnalyses run(Function &F, FunctionAnalysisManager &) {
-    if (!runBye(F))
-      return PreservedAnalyses::all();
-    return PreservedAnalyses::none();
+    errs() << "Bye: ";
+    errs().write_escaped(F.getName()) << '\n';
+
+    BasicBlock &entryBlock = F.getEntryBlock();
+    IRBuilder<> frontBuilder(&entryBlock.front());
+    frontBuilder.CreateCall(FunctionCallee(F.getParent()->getOrInsertFunction("instrument_start", Type::getVoidTy(F.getContext()))));
+
+    BasicBlock &backBlock = F.back();
+    IRBuilder<> backBuilder(&backBlock.back());
+    backBuilder.CreateCall(FunctionCallee(F.getParent()->getOrInsertFunction("instrument_end", Type::getVoidTy(F.getContext()))));
+
+    return PreservedAnalyses::all();
   }
 };
 
 } // namespace
-
-char LegacyBye::ID = 0;
-
-static RegisterPass<LegacyBye> X("goodbye", "Good Bye World Pass",
-                                 false /* Only looks at CFG */,
-                                 false /* Analysis Pass */);
 
 /* New PM Registration */
 llvm::PassPluginLibraryInfo getByePluginInfo() {
