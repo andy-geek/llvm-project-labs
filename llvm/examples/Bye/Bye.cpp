@@ -1,3 +1,7 @@
+// To instrument all functions in the module by adding the calls instrument_start()/instrument_end() 
+// to the beginning and end of each function
+
+
 #include "llvm/IR/Function.h"
 #include "llvm/Pass.h"
 #include "llvm/Passes/PassBuilder.h"
